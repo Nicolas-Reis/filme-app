@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.grupo.catalogoFilme.entities.Plataforma;
+import com.grupo.catalogoFilme.dto.plataforma.PlataformaCreateDTO;
+import com.grupo.catalogoFilme.dto.plataforma.PlataformaResponseDTO;
+import com.grupo.catalogoFilme.dto.plataforma.PlataformaUpdateDTO;
 import com.grupo.catalogoFilme.services.PlataformaService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,14 +28,14 @@ public class PlataformaController {
 	@GetMapping
 	@Operation(summary = "Lista as plataformas ativas", description = "Retorna apenas as plataformas com status ATIVO")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
-	public ResponseEntity<List<Plataforma>> procurarPlataforma(){
+	public ResponseEntity<List<PlataformaResponseDTO>> procurarPlataforma(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.procurarPlataforma());
 	}
 
 	@GetMapping(value = "/todos")
 	@Operation(summary = "Lista todas as plataformas", description = "Retorna todas as plataformas, incluindo as inativas (deletadas logicamente)")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
-	public ResponseEntity<List<Plataforma>> findAll(){
+	public ResponseEntity<List<PlataformaResponseDTO>> findAll(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
 	}
 
@@ -42,7 +44,7 @@ public class PlataformaController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Plataforma encontrada"),
 		@ApiResponse(responseCode = "404", description = "Plataforma não encontrada") })
-	public ResponseEntity<Plataforma> procurarPorId(@PathVariable Integer id) {
+	public ResponseEntity<PlataformaResponseDTO> procurarPorId(@PathVariable Integer id) {
 	    return ResponseEntity.ok(service.procurarPorId(id));
 	}
 
@@ -52,7 +54,7 @@ public class PlataformaController {
 		@ApiResponse(responseCode = "201", description = "Plataforma criada com sucesso"),
 		@ApiResponse(responseCode = "400", description = "Dados inválidos"),
 		@ApiResponse(responseCode = "409", description = "Plataforma já existe") })
-	public ResponseEntity<Plataforma> criarPlataforma(@Valid @RequestBody Plataforma plataforma){
+	public ResponseEntity<PlataformaResponseDTO> criarPlataforma(@Valid @RequestBody PlataformaCreateDTO plataforma){
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.criarPlataforma(plataforma));
 	}
 
@@ -61,7 +63,7 @@ public class PlataformaController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Plataforma atualizada"),
 		@ApiResponse(responseCode = "404", description = "Plataforma não encontrada") })
-	public ResponseEntity<Plataforma> atualizar(@PathVariable Integer id, @RequestBody Plataforma plataforma){
+	public ResponseEntity<PlataformaResponseDTO> atualizar(@PathVariable Integer id, @RequestBody PlataformaUpdateDTO plataforma){
 		return ResponseEntity.ok(service.atualizar(id, plataforma));
 	}
 

@@ -7,7 +7,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.grupo.catalogoFilme.entities.Filme;
+import com.grupo.catalogoFilme.dto.filme.FilmeCreateDTO;
+import com.grupo.catalogoFilme.dto.filme.FilmeResponseDTO;
+import com.grupo.catalogoFilme.dto.filme.FilmeUpdateDTO;
 import com.grupo.catalogoFilme.services.FilmeService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,14 +28,14 @@ public class FilmeController {
 	@GetMapping
 	@Operation(summary = "Lista os filmes ativos", description = "Retorna apenas os filmes com status ATIVO")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
-	public ResponseEntity<List<Filme>> procurarFilmes(){
+	public ResponseEntity<List<FilmeResponseDTO>> procurarFilmes(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.procurarFilmes());
 	}
 
 	@GetMapping(value = "/todos")
 	@Operation(summary = "Lista todos os filmes", description = "Retorna todos os filmes, incluindo os inativos (deletados logicamente)")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
-	public ResponseEntity<List<Filme>> findAll(){
+	public ResponseEntity<List<FilmeResponseDTO>> findAll(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
 	}
 
@@ -42,7 +44,7 @@ public class FilmeController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Filme encontrado"),
 		@ApiResponse(responseCode = "404", description = "Filme não encontrado") })
-	public ResponseEntity<Filme> procurarFilmeId(@PathVariable Integer id) {
+	public ResponseEntity<FilmeResponseDTO> procurarFilmeId(@PathVariable Integer id) {
 		return ResponseEntity.ok(service.procurarFilmeId(id));
 	}
 
@@ -53,7 +55,7 @@ public class FilmeController {
 		@ApiResponse(responseCode = "400", description = "Dados inválidos"),
 		@ApiResponse(responseCode = "404", description = "Gênero ou plataforma não encontrados"),
 		@ApiResponse(responseCode = "409", description = "Filme já cadastrado") })
-	public ResponseEntity<Filme> salvarFilme(@Valid @RequestBody Filme filme){
+	public ResponseEntity<FilmeResponseDTO> salvarFilme(@Valid @RequestBody FilmeCreateDTO filme){
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.salvarFilme(filme));
 	}
 
@@ -62,7 +64,7 @@ public class FilmeController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Filme atualizado"),
 		@ApiResponse(responseCode = "404", description = "Filme não encontrado") })
-	public ResponseEntity<Filme> atualizarFilme(@PathVariable Integer id, @RequestBody Filme filme){
+	public ResponseEntity<FilmeResponseDTO> atualizarFilme(@PathVariable Integer id, @RequestBody FilmeUpdateDTO filme){
 		return ResponseEntity.ok(service.atualizarFilme(id, filme));
 	}
 

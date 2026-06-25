@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.grupo.catalogoFilme.entities.Genero;
+import com.grupo.catalogoFilme.dto.genero.GeneroCreateDTO;
+import com.grupo.catalogoFilme.dto.genero.GeneroResponseDTO;
+import com.grupo.catalogoFilme.dto.genero.GeneroUpdateDTO;
 import com.grupo.catalogoFilme.services.GeneroService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,14 +27,14 @@ public class GeneroController {
 	@GetMapping
 	@Operation(summary = "Lista os gêneros ativos", description = "Retorna apenas os gêneros com status ATIVO")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
-	public ResponseEntity<List<Genero>> procurarGenero(){
+	public ResponseEntity<List<GeneroResponseDTO>> procurarGenero(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.procurarGenero());
 	}
 
 	@GetMapping(value = "/todos")
 	@Operation(summary = "Lista todos os gêneros", description = "Retorna todos os gêneros, incluindo os inativos (deletados logicamente)")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
-	public ResponseEntity<List<Genero>> findAll(){
+	public ResponseEntity<List<GeneroResponseDTO>> findAll(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
 	}
 
@@ -41,7 +43,7 @@ public class GeneroController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Gênero encontrado"),
 		@ApiResponse(responseCode = "404", description = "Gênero não encontrado") })
-	public ResponseEntity<Genero> procurarPorId(@PathVariable Integer id) {
+	public ResponseEntity<GeneroResponseDTO> procurarPorId(@PathVariable Integer id) {
 	    return ResponseEntity.ok(service.procurarPorId(id));
 	}
 
@@ -51,7 +53,7 @@ public class GeneroController {
 		@ApiResponse(responseCode = "201", description = "Gênero criado com sucesso"),
 		@ApiResponse(responseCode = "400", description = "Dados inválidos"),
 		@ApiResponse(responseCode = "409", description = "Gênero já existe") })
-	public ResponseEntity<Genero> criarGenero(@Valid @RequestBody Genero genero){
+	public ResponseEntity<GeneroResponseDTO> criarGenero(@Valid @RequestBody GeneroCreateDTO genero){
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.criarGenero(genero));
 	}
 
@@ -60,7 +62,7 @@ public class GeneroController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Gênero atualizado"),
 		@ApiResponse(responseCode = "404", description = "Gênero não encontrado") })
-	public ResponseEntity<Genero> atualizarGenero(@PathVariable Integer id, @RequestBody Genero genero){
+	public ResponseEntity<GeneroResponseDTO> atualizarGenero(@PathVariable Integer id, @Valid @RequestBody GeneroUpdateDTO genero){
 		return ResponseEntity.ok(service.atualizarGenero(id, genero));
 	}
 

@@ -6,7 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.grupo.catalogoFilme.entities.Avaliacao;
+import com.grupo.catalogoFilme.dto.avaliacao.AvaliacaoCreateDTO;
+import com.grupo.catalogoFilme.dto.avaliacao.AvaliacaoResponseDTO;
+import com.grupo.catalogoFilme.dto.avaliacao.AvaliacaoUpdateDTO;
 import com.grupo.catalogoFilme.services.AvaliacaoService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,14 +27,14 @@ public class AvaliacaoController {
 	@GetMapping
 	@Operation(summary = "Lista as avaliações ativas", description = "Retorna apenas as avaliações com status ATIVO")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
-	public ResponseEntity<List<Avaliacao>> procurarAvaliacoes(){
+	public ResponseEntity<List<AvaliacaoResponseDTO>> procurarAvaliacoes(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.procurarAvaliacoes());
 	}
 
 	@GetMapping(value = "/todos")
 	@Operation(summary = "Lista todas as avaliações", description = "Retorna todas as avaliações, incluindo as inativas (deletadas logicamente)")
 	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
-	public ResponseEntity<List<Avaliacao>> findAll(){
+	public ResponseEntity<List<AvaliacaoResponseDTO>> findAll(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
 	}
 
@@ -41,7 +43,7 @@ public class AvaliacaoController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Avaliação encontrada"),
 		@ApiResponse(responseCode = "404", description = "Avaliação não encontrada") })
-	public ResponseEntity<Avaliacao> procurarPorId(@PathVariable Integer id) {
+	public ResponseEntity<AvaliacaoResponseDTO> procurarPorId(@PathVariable Integer id) {
 		return ResponseEntity.ok(service.procurarPorId(id));
 	}
 
@@ -51,7 +53,7 @@ public class AvaliacaoController {
 		@ApiResponse(responseCode = "201", description = "Avaliação criada com sucesso"),
 		@ApiResponse(responseCode = "400", description = "Dados inválidos"),
 		@ApiResponse(responseCode = "404", description = "Filme ou usuário não encontrados") })
-	public ResponseEntity<Avaliacao> criarAvaliacao(@Valid @RequestBody Avaliacao avaliacao){
+	public ResponseEntity<AvaliacaoResponseDTO> criarAvaliacao(@Valid @RequestBody AvaliacaoCreateDTO avaliacao){
 		return ResponseEntity.status(HttpStatus.CREATED).body(service.criarAvaliacao(avaliacao));
 	}
 
@@ -60,7 +62,7 @@ public class AvaliacaoController {
 	@ApiResponses(value = {
 		@ApiResponse(responseCode = "200", description = "Avaliação atualizada"),
 		@ApiResponse(responseCode = "404", description = "Avaliação não encontrada") })
-	public ResponseEntity<Avaliacao> atualizarAvaliacao(@PathVariable Integer id, @RequestBody Avaliacao avaliacao){
+	public ResponseEntity<AvaliacaoResponseDTO> atualizarAvaliacao(@PathVariable Integer id, @RequestBody AvaliacaoUpdateDTO avaliacao){
 		return ResponseEntity.ok(service.atualizarAvaliacao(id, avaliacao));
 	}
 
