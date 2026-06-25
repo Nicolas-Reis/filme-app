@@ -1,6 +1,9 @@
 package com.grupo.catalogoFilme.dto.filme;
 
 import java.time.LocalDate;
+import java.util.Set;
+
+import com.grupo.catalogoFilme.enums.GeneroEnum;
 
 public class FilmeUpdateDTO {
 
@@ -8,14 +11,16 @@ public class FilmeUpdateDTO {
 	private String descricao;
 	private String diretor;
 	private LocalDate dataLancamento;
+	private Set<GeneroEnum> generos;
 
 	public FilmeUpdateDTO() {}
 
-	public FilmeUpdateDTO(String titulo, String descricao, String diretor, LocalDate dataLancamento) {
+	public FilmeUpdateDTO(String titulo, String descricao, String diretor, LocalDate dataLancamento, Set<GeneroEnum> generos) {
 		this.titulo = titulo;
 		this.descricao = descricao;
 		this.diretor = diretor;
 		this.dataLancamento = dataLancamento;
+		this.generos = generos;
 	}
 
 	public String getTitulo() {
@@ -48,5 +53,13 @@ public class FilmeUpdateDTO {
 
 	public void setDataLancamento(LocalDate dataLancamento) {
 		this.dataLancamento = dataLancamento;
+	}
+
+	public Set<GeneroEnum> getGeneros() {
+		return generos;
+	}
+
+	public void setGeneros(Set<GeneroEnum> generos) {
+		this.generos = generos;
 	}
 }

@@ -2,14 +2,20 @@ package com.grupo.catalogoFilme.entities;
 
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.grupo.catalogoFilme.enums.GeneroEnum;
 import com.grupo.catalogoFilme.enums.StatusRegistro;
+import com.grupo.catalogoFilme.enums.converter.GeneroEnumConverter;
 import com.grupo.catalogoFilme.enums.converter.StatusRegistroConverter;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -44,11 +50,12 @@ public class Filme {
 	@Column(name = "status", nullable = false)
 	private StatusRegistro status = StatusRegistro.ATIVO;
 
-	@ManyToOne
-	@JoinColumn(name = "genero_id")
-	@JsonManagedReference
-	private Genero genero;
-	
+	@ElementCollection(fetch = FetchType.EAGER)
+	@CollectionTable(name = "filme_genero", joinColumns = @JoinColumn(name = "filme_id"))
+	@Column(name = "genero", nullable = false)
+	@Convert(converter = GeneroEnumConverter.class)
+	private Set<GeneroEnum> generos = new HashSet<>();
+
 	@ManyToOne
 	@JoinColumn(name = "plataforma_id")
 	@JsonManagedReference
@@ -60,13 +67,13 @@ public class Filme {
 
 	public Filme() {}
 
-	public Filme(Integer id, String titulo, String descricao, String diretor, LocalDate dataLancamento, Genero genero, Plataforma plataforma) {
+	public Filme(Integer id, String titulo, String descricao, String diretor, LocalDate dataLancamento, Set<GeneroEnum> generos, Plataforma plataforma) {
 		this.id = id;
 		this.titulo = titulo;
 		this.descricao = descricao;
 		this.diretor = diretor;
 		this.dataLancamento = dataLancamento;
-		this.genero = genero;
+		this.generos = generos;
 		this.plataforma = plataforma;
 	}
 
@@ -118,12 +125,12 @@ public class Filme {
 		this.status = status;
 	}
 
-	public Genero getGenero() {
-		return genero;
+	public Set<GeneroEnum> getGeneros() {
+		return generos;
 	}
 
-	public void setGenero(Genero genero) {
-		this.genero = genero;
+	public void setGeneros(Set<GeneroEnum> generos) {
+		this.generos = generos;
 	}
 
 	public Plataforma getPlataforma() {

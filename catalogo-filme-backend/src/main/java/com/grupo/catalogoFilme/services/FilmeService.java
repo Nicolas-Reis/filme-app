@@ -49,6 +49,7 @@ public class FilmeService {
         if (dto.getDescricao() != null && !dto.getDescricao().isBlank()) existingFilme.setDescricao(dto.getDescricao());
         if (dto.getDiretor() != null && !dto.getDiretor().isBlank()) existingFilme.setDiretor(dto.getDiretor());
         if (dto.getDataLancamento() != null) existingFilme.setDataLancamento(dto.getDataLancamento());
+        if (dto.getGeneros() != null && !dto.getGeneros().isEmpty()) existingFilme.setGeneros(dto.getGeneros());
 
         return filmeMapper.toDTO(filmeRepositorio.save(existingFilme));
 	}

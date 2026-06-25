@@ -1,6 +1,7 @@
 package com.grupo.catalogoFilme.dto.filme;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import com.grupo.catalogoFilme.dto.genero.GeneroResponseDTO;
 import com.grupo.catalogoFilme.dto.plataforma.PlataformaResponseDTO;
@@ -14,20 +15,20 @@ public class FilmeResponseDTO {
 	private String diretor;
 	private LocalDate dataLancamento;
 	private StatusRegistro status;
-	private GeneroResponseDTO genero;
+	private List<GeneroResponseDTO> generos;
 	private PlataformaResponseDTO plataforma;
 
 	public FilmeResponseDTO() {}
 
 	public FilmeResponseDTO(Integer id, String titulo, String descricao, String diretor, LocalDate dataLancamento,
-			StatusRegistro status, GeneroResponseDTO genero, PlataformaResponseDTO plataforma) {
+			StatusRegistro status, List<GeneroResponseDTO> generos, PlataformaResponseDTO plataforma) {
 		this.id = id;
 		this.titulo = titulo;
 		this.descricao = descricao;
 		this.diretor = diretor;
 		this.dataLancamento = dataLancamento;
 		this.status = status;
-		this.genero = genero;
+		this.generos = generos;
 		this.plataforma = plataforma;
 	}
 
@@ -79,12 +80,12 @@ public class FilmeResponseDTO {
 		this.status = status;
 	}
 
-	public GeneroResponseDTO getGenero() {
-		return genero;
+	public List<GeneroResponseDTO> getGeneros() {
+		return generos;
 	}
 
-	public void setGenero(GeneroResponseDTO genero) {
-		this.genero = genero;
+	public void setGeneros(List<GeneroResponseDTO> generos) {
+		this.generos = generos;
 	}
 
 	public PlataformaResponseDTO getPlataforma() {

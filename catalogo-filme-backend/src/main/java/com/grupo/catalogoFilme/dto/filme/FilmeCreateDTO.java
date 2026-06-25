@@ -1,8 +1,12 @@
 package com.grupo.catalogoFilme.dto.filme;
 
 import java.time.LocalDate;
+import java.util.Set;
+
+import com.grupo.catalogoFilme.enums.GeneroEnum;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 public class FilmeCreateDTO {
@@ -15,19 +19,19 @@ public class FilmeCreateDTO {
 	private String diretor;
 	@NotNull(message = "Data de lançamento é obrigatória")
 	private LocalDate dataLancamento;
-	@NotNull(message = "ID do gênero é obrigatório")
-	private Integer generoId;
+	@NotEmpty(message = "Informe ao menos um gênero")
+	private Set<GeneroEnum> generos;
 	@NotNull(message = "ID da plataforma é obrigatório")
 	private Integer plataformaId;
 
 	public FilmeCreateDTO() {}
 
-	public FilmeCreateDTO(String titulo, String descricao, String diretor, LocalDate dataLancamento, Integer generoId, Integer plataformaId) {
+	public FilmeCreateDTO(String titulo, String descricao, String diretor, LocalDate dataLancamento, Set<GeneroEnum> generos, Integer plataformaId) {
 		this.titulo = titulo;
 		this.descricao = descricao;
 		this.diretor = diretor;
 		this.dataLancamento = dataLancamento;
-		this.generoId = generoId;
+		this.generos = generos;
 		this.plataformaId = plataformaId;
 	}
 
@@ -63,12 +67,12 @@ public class FilmeCreateDTO {
 		this.dataLancamento = dataLancamento;
 	}
 
-	public Integer getGeneroId() {
-		return generoId;
+	public Set<GeneroEnum> getGeneros() {
+		return generos;
 	}
 
-	public void setGeneroId(Integer generoId) {
-		this.generoId = generoId;
+	public void setGeneros(Set<GeneroEnum> generos) {
+		this.generos = generos;
 	}
 
 	public Integer getPlataformaId() {

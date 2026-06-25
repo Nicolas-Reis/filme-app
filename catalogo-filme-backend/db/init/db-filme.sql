@@ -47,18 +47,8 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `catalogo-filme`.`generos`
--- -----------------------------------------------------
-CREATE TABLE IF NOT EXISTS `catalogo-filme`.`generos` (
-  `id` INT NOT NULL AUTO_INCREMENT,
-  `nome` VARCHAR(45) NOT NULL,
-  `status` INT NOT NULL DEFAULT 1,
-  PRIMARY KEY (`id`))
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `catalogo-filme`.`filmes`
+-- genero: relacao via tabela `filme_genero` (valores fixos do enum GeneroEnum)
 -- -----------------------------------------------------
 CREATE TABLE IF NOT EXISTS `catalogo-filme`.`filmes` (
   `id` INT NOT NULL AUTO_INCREMENT,
@@ -66,20 +56,29 @@ CREATE TABLE IF NOT EXISTS `catalogo-filme`.`filmes` (
   `descricao` VARCHAR(255) NOT NULL,
   `diretor` VARCHAR(45) NOT NULL,
   `data_lancamento` DATE NOT NULL,
-  `genero_id` INT NOT NULL,
   `plataforma_id` INT NOT NULL,
   `status` INT NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   INDEX `fk_plataforma_filme_idx` (`plataforma_id` ASC),
-  INDEX `fk_generos_filme_idx` (`genero_id` ASC),
   CONSTRAINT `fk_plataforma_filme`
     FOREIGN KEY (`plataforma_id`)
     REFERENCES `catalogo-filme`.`plataformas` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_generos_filme`
-    FOREIGN KEY (`genero_id`)
-    REFERENCES `catalogo-filme`.`generos` (`id`)
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `catalogo-filme`.`filme_genero`
+-- generos de um filme (codigo do enum GeneroEnum salvo como Integer)
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `catalogo-filme`.`filme_genero` (
+  `filme_id` INT NOT NULL,
+  `genero` INT NOT NULL,
+  PRIMARY KEY (`filme_id`, `genero`),
+  CONSTRAINT `fk_filme_genero_filme`
+    FOREIGN KEY (`filme_id`)
+    REFERENCES `catalogo-filme`.`filmes` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
