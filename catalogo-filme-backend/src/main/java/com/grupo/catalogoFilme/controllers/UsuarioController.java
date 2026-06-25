@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.grupo.catalogoFilme.dto.usuario.UsuarioCreateDTO;
-import com.grupo.catalogoFilme.dto.usuario.UsuarioLoginDTO;
 import com.grupo.catalogoFilme.dto.usuario.UsuarioResponseDTO;
 import com.grupo.catalogoFilme.services.UsuarioService;
 
@@ -16,11 +14,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping(value = "/usuarios")
-@CrossOrigin(origins = "*")
 @Tag(name = "Usuários", description = "Cadastro, login e consulta de usuários")
 public class UsuarioController {
     @Autowired private UsuarioService service;
@@ -48,23 +44,4 @@ public class UsuarioController {
         return ResponseEntity.ok(service.buscarPorId(id));
     }
 
-    @PostMapping(value = "/cadastro")
-    @Operation(summary = "Cadastra um novo usuário")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Dados inválidos ou e-mail indisponível"),
-        @ApiResponse(responseCode = "404", description = "Cargo não encontrado") })
-    public ResponseEntity<UsuarioResponseDTO> cadastrar(@Valid @RequestBody UsuarioCreateDTO usuario){
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.cadastrar(usuario));
-    }
-
-    @PostMapping(value = "/login")
-    @Operation(summary = "Realiza login", description = "Valida e-mail e senha e retorna os dados do usuário")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Login realizado com sucesso"),
-        @ApiResponse(responseCode = "400", description = "Credenciais inválidas"),
-        @ApiResponse(responseCode = "404", description = "Usuário não cadastrado") })
-    public ResponseEntity<UsuarioResponseDTO> login(@Valid @RequestBody UsuarioLoginDTO login){
-        return ResponseEntity.ok(service.login(login.getEmail(), login.getSenha()));
-    }
 }

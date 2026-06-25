@@ -149,6 +149,20 @@ INSERT INTO `catalogo-filme`.`cargos` (`nome`) VALUES ('ROLE_ADMIN');
 INSERT INTO `catalogo-filme`.`cargos` (`nome`) VALUES ('ROLE_USER');
 
 
+-- -----------------------------------------------------
+-- Dados iniciais: usuario administrador padrao
+-- Credenciais: admin@catalogo.com / admin123
+-- senha em BCrypt (NUNCA armazenar em texto puro)
+-- -----------------------------------------------------
+INSERT INTO `catalogo-filme`.`usuarios` (`nome`, `email`, `senha`, `status`)
+VALUES ('Administrador', 'admin@catalogo.com', '$2a$10$JXizZDD4yq0lpKxIxSs5GumCqOrGHRbbDjxULQA0B5RZ9LuIce3Qq', 1);
+
+INSERT INTO `catalogo-filme`.`usuario_cargo` (`usuario_id`, `cargo_id`)
+SELECT u.`id`, c.`id`
+FROM `catalogo-filme`.`usuarios` u, `catalogo-filme`.`cargos` c
+WHERE u.`email` = 'admin@catalogo.com' AND c.`nome` = 'ROLE_ADMIN';
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
