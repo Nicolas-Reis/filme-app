@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.grupo.catalogoFilme.security.JwtAccessDeniedHandler;
 import com.grupo.catalogoFilme.security.JwtAuthFilter;
 import com.grupo.catalogoFilme.security.JwtAuthenticationEntryPoint;
 
@@ -27,10 +28,13 @@ public class SecurityConfig {
 
 	private final JwtAuthFilter jwtAuthFilter;
 	private final JwtAuthenticationEntryPoint authenticationEntryPoint;
+	private final JwtAccessDeniedHandler accessDeniedHandler;
 
-	public SecurityConfig(JwtAuthFilter jwtAuthFilter, JwtAuthenticationEntryPoint authenticationEntryPoint) {
+	public SecurityConfig(JwtAuthFilter jwtAuthFilter, JwtAuthenticationEntryPoint authenticationEntryPoint,
+			JwtAccessDeniedHandler accessDeniedHandler) {
 		this.jwtAuthFilter = jwtAuthFilter;
 		this.authenticationEntryPoint = authenticationEntryPoint;
+		this.accessDeniedHandler = accessDeniedHandler;
 	}
 
 	@Bean
@@ -39,7 +43,9 @@ public class SecurityConfig {
 			.csrf(csrf -> csrf.disable())
 			.cors(cors -> cors.configurationSource(corsConfigurationSource()))
 			.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-			.exceptionHandling(ex -> ex.authenticationEntryPoint(authenticationEntryPoint))
+			.exceptionHandling(ex -> ex
+				.authenticationEntryPoint(authenticationEntryPoint)
+				.accessDeniedHandler(accessDeniedHandler))
 			.authorizeHttpRequests(auth -> auth
 				.requestMatchers(HttpMethod.POST, "/auth/**", "/usuarios/cadastro", "/usuarios/login").permitAll()
 				.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
