@@ -27,7 +27,7 @@ CREATE TABLE IF NOT EXISTS `catalogo-filme`.`usuarios` (
   `nome` VARCHAR(45) NOT NULL,
   `email` VARCHAR(45) NOT NULL,
   `senha` VARCHAR(255) NOT NULL,
-  `url_image` VARCHAR(255) NOT NULL,
+  `url_image` VARCHAR(255) NULL,
   `status` INT NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
   UNIQUE INDEX `uk_usuarios_email` (`email` ASC))
@@ -40,7 +40,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `catalogo-filme`.`plataformas` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `nome` VARCHAR(45) NOT NULL,
-  `url_image` VARCHAR(255) NOT NULL,
+  `url_image` VARCHAR(255) NULL,
   `status` INT NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
@@ -91,7 +91,7 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `catalogo-filme`.`avaliacoes` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `comentario` VARCHAR(255) NOT NULL,
-  `url_image` VARCHAR(255) NOT NULL,
+  `url_image` VARCHAR(255) NULL,
   `nota` DOUBLE NOT NULL,
   `usuario_id` INT NOT NULL,
   `filme_id` INT NOT NULL,

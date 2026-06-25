@@ -3,7 +3,7 @@ package com.grupo.catalogoFilme.entities;
 import java.util.HashSet;
 import java.util.Set;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.grupo.catalogoFilme.enums.StatusRegistro;
 import com.grupo.catalogoFilme.enums.converter.StatusRegistroConverter;
 
@@ -33,11 +33,11 @@ public class Usuario {
 	@Column(name = "email", nullable = false, unique = true)
 	private String email;
 
-	@JsonIgnore
+	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
 	@Column(name = "senha", nullable = false)
 	private String senha;
 
-	@Column(name = "url_image", nullable = false)
+	@Column(name = "url_image")
 	private String urlImage;
 
 	@Convert(converter = StatusRegistroConverter.class)

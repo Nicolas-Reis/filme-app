@@ -25,7 +25,7 @@ public class Plataforma {
 	@Column(name = "nome", nullable = false)
 	private String nome;
 
-	@Column(name = "url_image", nullable = false)
+	@Column(name = "url_image")
 	private String urlImage;
 
 	@Convert(converter = StatusRegistroConverter.class)
