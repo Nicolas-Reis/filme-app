@@ -5,6 +5,7 @@ package com.grupo.catalogoFilme.services;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.grupo.catalogoFilme.dto.usuario.UsuarioCreateDTO;
@@ -20,6 +21,7 @@ import com.grupo.catalogoFilme.repositories.UsuarioRepository;
 public class UsuarioService {
     @Autowired private UsuarioRepository repository;
     @Autowired private UsuarioMapper usuarioMapper;
+    @Autowired private PasswordEncoder passwordEncoder;
 
     public List<UsuarioResponseDTO> listar() {
     	return repository.findAllByStatusNot(StatusRegistro.INATIVO).stream().map(usuarioMapper::toDTO).toList();
@@ -33,16 +35,10 @@ public class UsuarioService {
         return usuarioMapper.toDTO(buscarAtivo(id));
     }
 
-    public UsuarioResponseDTO login(String email, String senha) {
-        if (email == null || email.isBlank() || senha == null || senha.isBlank()) throw new DadosInvalidosException("E-mail e senha são obrigatórios.");
-        Usuario usuario = repository.findByEmail(email).orElseThrow(() -> new RegistroNaoEncontradoException("Usuário não cadastrado."));
-        if (!usuario.getSenha().equals(senha)) throw new DadosInvalidosException("Senha incorreta.");
-        return usuarioMapper.toDTO(usuario);
-    }
-
     public UsuarioResponseDTO cadastrar(UsuarioCreateDTO dto) {
         if (repository.findByEmail(dto.getEmail()).isPresent()) throw new DadosInvalidosException("E-mail indisponível.");
         Usuario usuario = usuarioMapper.toEntity(dto);
+        usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
         usuario.setStatus(StatusRegistro.ATIVO);
         return usuarioMapper.toDTO(repository.save(usuario));
     }

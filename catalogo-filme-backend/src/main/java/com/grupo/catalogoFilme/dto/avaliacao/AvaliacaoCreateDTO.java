@@ -12,17 +12,14 @@ public class AvaliacaoCreateDTO {
 	private Double nota;
 	@NotNull(message = "ID do filme é obrigatório")
 	private Integer filmeId;
-	@NotNull(message = "ID do usuário é obrigatório")
-	private Integer usuarioId;
 
 	public AvaliacaoCreateDTO() {}
 
-	public AvaliacaoCreateDTO(String comentario, String urlImage, Double nota, Integer filmeId, Integer usuarioId) {
+	public AvaliacaoCreateDTO(String comentario, String urlImage, Double nota, Integer filmeId) {
 		this.comentario = comentario;
 		this.urlImage = urlImage;
 		this.nota = nota;
 		this.filmeId = filmeId;
-		this.usuarioId = usuarioId;
 	}
 
 	public String getComentario() {
@@ -55,13 +52,5 @@ public class AvaliacaoCreateDTO {
 
 	public void setFilmeId(Integer filmeId) {
 		this.filmeId = filmeId;
-	}
-
-	public Integer getUsuarioId() {
-		return usuarioId;
-	}
-
-	public void setUsuarioId(Integer usuarioId) {
-		this.usuarioId = usuarioId;
 	}
 }

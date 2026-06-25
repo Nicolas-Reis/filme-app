@@ -9,6 +9,7 @@ import com.grupo.catalogoFilme.dto.usuario.UsuarioCreateDTO;
 import com.grupo.catalogoFilme.dto.usuario.UsuarioResponseDTO;
 import com.grupo.catalogoFilme.entities.Cargo;
 import com.grupo.catalogoFilme.entities.Usuario;
+import com.grupo.catalogoFilme.enums.CargoEnum;
 import com.grupo.catalogoFilme.exceptions.RegistroNaoEncontradoException;
 import com.grupo.catalogoFilme.repositories.CargoRepository;
 
@@ -35,8 +36,8 @@ public class UsuarioMapper {
 		usuario.setEmail(dto.getEmail());
 		usuario.setSenha(dto.getSenha());
 		usuario.setUrlImage(dto.getUrlImage());
-		Cargo cargo = cargoRepository.findByNome(dto.getCargo().name())
-				.orElseThrow(() -> new RegistroNaoEncontradoException("Cargo não encontrado: " + dto.getCargo().name()));
+		Cargo cargo = cargoRepository.findByNome(CargoEnum.ROLE_USER.name())
+				.orElseThrow(() -> new RegistroNaoEncontradoException("Cargo não encontrado: " + CargoEnum.ROLE_USER.name()));
 		usuario.getCargos().add(cargo);
 		return usuario;
 	}
