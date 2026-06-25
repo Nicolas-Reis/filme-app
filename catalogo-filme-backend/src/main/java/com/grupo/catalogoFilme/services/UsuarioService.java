@@ -10,16 +10,20 @@ import org.springframework.stereotype.Service;
 
 import com.grupo.catalogoFilme.dto.usuario.UsuarioCreateDTO;
 import com.grupo.catalogoFilme.dto.usuario.UsuarioResponseDTO;
+import com.grupo.catalogoFilme.entities.Cargo;
 import com.grupo.catalogoFilme.entities.Usuario;
+import com.grupo.catalogoFilme.enums.CargoEnum;
 import com.grupo.catalogoFilme.enums.StatusRegistro;
 import com.grupo.catalogoFilme.exceptions.DadosInvalidosException;
 import com.grupo.catalogoFilme.exceptions.RegistroNaoEncontradoException;
 import com.grupo.catalogoFilme.mapper.UsuarioMapper;
+import com.grupo.catalogoFilme.repositories.CargoRepository;
 import com.grupo.catalogoFilme.repositories.UsuarioRepository;
 
 @Service
 public class UsuarioService {
     @Autowired private UsuarioRepository repository;
+    @Autowired private CargoRepository cargoRepository;
     @Autowired private UsuarioMapper usuarioMapper;
     @Autowired private PasswordEncoder passwordEncoder;
 
@@ -40,6 +44,15 @@ public class UsuarioService {
         Usuario usuario = usuarioMapper.toEntity(dto);
         usuario.setSenha(passwordEncoder.encode(dto.getSenha()));
         usuario.setStatus(StatusRegistro.ATIVO);
+        return usuarioMapper.toDTO(repository.save(usuario));
+    }
+
+    public UsuarioResponseDTO promoverParaAdmin(Integer id) {
+        Usuario usuario = buscarAtivo(id);
+        Cargo cargoAdmin = cargoRepository.findByNome(CargoEnum.ROLE_ADMIN.name())
+                .orElseThrow(() -> new RegistroNaoEncontradoException("Cargo não encontrado: " + CargoEnum.ROLE_ADMIN.name()));
+        usuario.getCargos().clear();
+        usuario.getCargos().add(cargoAdmin);
         return usuarioMapper.toDTO(repository.save(usuario));
     }
 

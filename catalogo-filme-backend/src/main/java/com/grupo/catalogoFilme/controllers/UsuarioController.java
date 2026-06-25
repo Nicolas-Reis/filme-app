@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.grupo.catalogoFilme.dto.usuario.UsuarioResponseDTO;
+import com.grupo.catalogoFilme.services.AuthorizationService;
 import com.grupo.catalogoFilme.services.UsuarioService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -20,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Tag(name = "Usuários", description = "Cadastro, login e consulta de usuários")
 public class UsuarioController {
     @Autowired private UsuarioService service;
+    @Autowired private AuthorizationService authorizationService;
 
     @GetMapping
     @Operation(summary = "Lista os usuários ativos", description = "Retorna apenas os usuários com status ATIVO (sem expor a senha)")
@@ -42,6 +44,18 @@ public class UsuarioController {
         @ApiResponse(responseCode = "404", description = "Usuário não encontrado") })
     public ResponseEntity<UsuarioResponseDTO> buscarPorId(@PathVariable Integer id){
         return ResponseEntity.ok(service.buscarPorId(id));
+    }
+
+    @PutMapping(value = "/{id}/promover-admin")
+    @Operation(summary = "Promove um usuário a administrador",
+        description = "Restrito a ADMIN. Substitui a role do usuário (ROLE_USER) por ROLE_ADMIN, sem acumular as duas.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Usuário promovido a administrador"),
+        @ApiResponse(responseCode = "403", description = "Acesso restrito a administradores"),
+        @ApiResponse(responseCode = "404", description = "Usuário não encontrado") })
+    public ResponseEntity<UsuarioResponseDTO> promoverParaAdmin(@PathVariable Integer id){
+        authorizationService.exigirAdmin();
+        return ResponseEntity.ok(service.promoverParaAdmin(id));
     }
 
 }

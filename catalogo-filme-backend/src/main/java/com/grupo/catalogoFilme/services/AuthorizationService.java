@@ -11,6 +11,7 @@ import com.grupo.catalogoFilme.dto.usuario.UsuarioLoginDTO;
 import com.grupo.catalogoFilme.entities.Usuario;
 import com.grupo.catalogoFilme.enums.CargoEnum;
 import com.grupo.catalogoFilme.enums.StatusRegistro;
+import com.grupo.catalogoFilme.exceptions.AcessoNegadoException;
 import com.grupo.catalogoFilme.exceptions.RegistroNaoEncontradoException;
 import com.grupo.catalogoFilme.mapper.UsuarioMapper;
 import com.grupo.catalogoFilme.repositories.UsuarioRepository;
@@ -58,6 +59,12 @@ public class AuthorizationService {
 	public boolean isAdmin(Usuario usuario) {
 		return usuario.getCargos().stream()
 				.anyMatch(cargo -> CargoEnum.ROLE_ADMIN.name().equals(cargo.getNome()));
+	}
+
+	public void exigirAdmin() {
+		if (!isAdmin(usuarioAutenticado())) {
+			throw new AcessoNegadoException("Acesso restrito a administradores.");
+		}
 	}
 
 	private void garantirAtivo(Usuario usuario) {
