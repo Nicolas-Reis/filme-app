@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.grupo.catalogoFilme.entities.Filme;
+import com.grupo.catalogoFilme.enums.StatusRegistro;
 import com.grupo.catalogoFilme.exceptions.DadosInvalidosException;
 import com.grupo.catalogoFilme.exceptions.FilmeJaFoiLogadoException;
 import com.grupo.catalogoFilme.exceptions.RegistroNaoEncontradoException;
@@ -20,47 +21,50 @@ public class FilmeService {
 	@Autowired private GeneroRepository generoRepositorio;
 	@Autowired private PlataformaRepository plataformaRepositorio;
 
-	public List<Filme> procurarFilmes() { return filmeRepositorio.findAll(); }
+	public List<Filme> procurarFilmes() { return filmeRepositorio.findAllByStatusNot(StatusRegistro.INATIVO); }
 
-	public Filme procurarFilmeId(Long id) {
-		return filmeRepositorio.findById(id).orElseThrow(() ->
+	public List<Filme> findAll() { return filmeRepositorio.findAll(); }
+
+	public Filme procurarFilmeId(Integer id) {
+		Filme filme = filmeRepositorio.findById(id).orElseThrow(() ->
         new RegistroNaoEncontradoException("Filme com id " + id + " não encontrado"));
+		if (filme.getStatus() == StatusRegistro.INATIVO) throw new RegistroNaoEncontradoException("Filme com id " + id + " não encontrado");
+		return filme;
 	}
 
-	public String salvarFilme(Filme filme) {
+	public Filme salvarFilme(Filme filme) {
 		if(filme.getTitulo() == null || filme.getTitulo().isBlank()) throw new DadosInvalidosException("ERRO! Título do filme é obrigatório");
+		if(filme.getDescricao() == null || filme.getDescricao().isBlank()) throw new DadosInvalidosException("ERRO! Descrição do filme é obrigatória");
 		if(filme.getDiretor() == null || filme.getDiretor().isBlank()) throw new DadosInvalidosException("ERRO! Diretor do filme é obrigatório");
-		if(filme.getAnoLancamento() == null || filme.getAnoLancamento() < 1888) throw new DadosInvalidosException("ERRO! Ano de lançamento inválido");
-		
+		if(filme.getDataLancamento() == null) throw new DadosInvalidosException("ERRO! Data de lançamento inválida");
+
         if (filme.getGenero() == null || filme.getGenero().getId() == null) throw new DadosInvalidosException("ERRO! ID do gênero é obrigatório");
-        Long generoId = filme.getGenero().getId();
+        Integer generoId = filme.getGenero().getId();
         generoRepositorio.findById(generoId).orElseThrow(() -> new RegistroNaoEncontradoException("Não foi possível salvar: Gênero com ID " + generoId + " não encontrado."));
 
         if (filme.getPlataforma() == null || filme.getPlataforma().getId() == null) throw new DadosInvalidosException("ERRO! ID da plataforma é obrigatório");
-        Long plataformaId = filme.getPlataforma().getId();
+        Integer plataformaId = filme.getPlataforma().getId();
         plataformaRepositorio.findById(plataformaId).orElseThrow(() -> new RegistroNaoEncontradoException("Não foi possível salvar: Plataforma com ID " + plataformaId + " não encontrada."));
-        
+
         boolean filmeJaExiste = filmeRepositorio.findAll().stream()
-            .anyMatch(f -> f.getTitulo().equalsIgnoreCase(filme.getTitulo()) && f.getDiretor().equalsIgnoreCase(filme.getDiretor()) && f.getAnoLancamento().equals(filme.getAnoLancamento()));
+            .anyMatch(f -> f.getTitulo().equalsIgnoreCase(filme.getTitulo()) && f.getDiretor().equalsIgnoreCase(filme.getDiretor()) && f.getDataLancamento().equals(filme.getDataLancamento()));
         if (filmeJaExiste) throw new FilmeJaFoiLogadoException("ERRO! Já existe um filme cadastrado com esses dados.");
 
-		filmeRepositorio.save(filme);
-		return "Filme saved!";
+		filme.setStatus(StatusRegistro.ATIVO);
+		return filmeRepositorio.save(filme);
 	}
 
-	public String atualizarFilme(Long id, Filme filme) {
-		Filme existingFilme = filmeRepositorio.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Filme não encontrado"));
+	public Filme atualizarFilme(Integer id, Filme filme) {
+		Filme existingFilme = procurarFilmeId(id);
 		if (filme.getTitulo() != null && !filme.getTitulo().isBlank()) existingFilme.setTitulo(filme.getTitulo());
+        if (filme.getDescricao() != null && !filme.getDescricao().isBlank()) existingFilme.setDescricao(filme.getDescricao());
         if (filme.getDiretor() != null && !filme.getDiretor().isBlank()) existingFilme.setDiretor(filme.getDiretor());
-        if (filme.getAnoLancamento() != null && filme.getAnoLancamento() >= 1888) existingFilme.setAnoLancamento(filme.getAnoLancamento());
-        
-        filmeRepositorio.save(existingFilme);
-		return "Filme atualizado com sucesso!";
+        if (filme.getDataLancamento() != null) existingFilme.setDataLancamento(filme.getDataLancamento());
+
+        return filmeRepositorio.save(existingFilme);
 	}
 
-	public String excluirFilme(Long id) {
-		if(!filmeRepositorio.existsById(id)) throw new RegistroNaoEncontradoException("O filme de id "+id+" não foi encontrado");
-		filmeRepositorio.deleteById(id);
-		return "Filme deletado com sucesso";
+	public void excluirFilme(Integer id) {
+		if (filmeRepositorio.logicalDeleteById(id) == 0) throw new RegistroNaoEncontradoException("O filme de id " + id + " não foi encontrado");
 	}
 }

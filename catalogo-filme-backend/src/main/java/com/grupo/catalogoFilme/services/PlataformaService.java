@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.grupo.catalogoFilme.entities.Plataforma;
+import com.grupo.catalogoFilme.enums.StatusRegistro;
 import com.grupo.catalogoFilme.exceptions.DadosInvalidosException;
 import com.grupo.catalogoFilme.exceptions.PlataformaJaExisteException;
 import com.grupo.catalogoFilme.exceptions.RegistroNaoEncontradoException;
@@ -15,30 +16,33 @@ import com.grupo.catalogoFilme.repositories.PlataformaRepository;
 public class PlataformaService {
     @Autowired private PlataformaRepository plataformaRepositorio;
 
-	public List<Plataforma> procurarPlataforma() { return plataformaRepositorio.findAll(); }
-     
-	public Plataforma procurarPorId(Long id) {
-		return plataformaRepositorio.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Plataforma não encontrada"));
+	public List<Plataforma> procurarPlataforma() { return plataformaRepositorio.findAllByStatusNot(StatusRegistro.INATIVO); }
+
+	public List<Plataforma> findAll() { return plataformaRepositorio.findAll(); }
+
+	public Plataforma procurarPorId(Integer id) {
+		Plataforma plataforma = plataformaRepositorio.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Plataforma não encontrada"));
+		if (plataforma.getStatus() == StatusRegistro.INATIVO) throw new RegistroNaoEncontradoException("Plataforma não encontrada");
+		return plataforma;
 	}
 
-	public String criarPlataforma(Plataforma plataforma) {
+	public Plataforma criarPlataforma(Plataforma plataforma) {
 		if(plataforma.getNome() == null || plataforma.getNome().isBlank()) throw new DadosInvalidosException("ERRO! Nome obrigatório");
         if (plataformaRepositorio.findAll().stream().anyMatch(p -> p.getNome().equalsIgnoreCase(plataforma.getNome()))) throw new PlataformaJaExisteException("Plataforma já existe.");
-		plataformaRepositorio.save(plataforma);
-		return "Plataforma salva!";
+		plataforma.setStatus(StatusRegistro.ATIVO);
+		return plataformaRepositorio.save(plataforma);
 	}
 
-	public String atualizar(Long id, Plataforma dadosNovos) {
+	public Plataforma atualizar(Integer id, Plataforma dadosNovos) {
         Plataforma existente = procurarPorId(id);
         existente.setNome(dadosNovos.getNome());
-        plataformaRepositorio.save(existente);
-        return "Plataforma atualizada!";
+        if (dadosNovos.getUrlImage() != null) existente.setUrlImage(dadosNovos.getUrlImage());
+        return plataformaRepositorio.save(existente);
     }
-	
-	public String excluirPlataforma(Long id) {
-		Plataforma plataforma = plataformaRepositorio.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Plataforma não encontrada"));
+
+	public void excluirPlataforma(Integer id) {
+		Plataforma plataforma = procurarPorId(id);
 		if (plataforma.getFilmes() != null && !plataforma.getFilmes().isEmpty()) throw new DadosInvalidosException("Não é possível deletar plataforma com filmes vinculados.");
-		plataformaRepositorio.deleteById(id);
-		return "Plataforma deletada";
+		plataformaRepositorio.logicalDeleteById(id);
 	}
 }
