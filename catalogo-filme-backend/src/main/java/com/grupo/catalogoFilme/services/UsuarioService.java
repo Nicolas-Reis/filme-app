@@ -56,6 +56,11 @@ public class UsuarioService {
         return usuarioMapper.toDTO(repository.save(usuario));
     }
 
+    public UsuarioResponseDTO atualizarImagem(Usuario usuario, String url) {
+        usuario.setUrlImage(url);
+        return usuarioMapper.toDTO(repository.save(usuario));
+    }
+
     private Usuario buscarAtivo(Integer id) {
         Usuario usuario = repository.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Usuário não encontrado."));
         if (usuario.getStatus() == StatusRegistro.INATIVO) throw new RegistroNaoEncontradoException("Usuário não encontrado.");

@@ -60,6 +60,12 @@ public class FilmeService {
         return filmeMapper.toDTO(filmeRepositorio.save(existingFilme));
 	}
 
+	public FilmeResponseDTO atualizarImagem(Integer id, String url) {
+		Filme filme = buscarAtivo(id);
+		filme.setUrlImage(url);
+		return filmeMapper.toDTO(filmeRepositorio.save(filme));
+	}
+
 	public void excluirFilme(Integer id) {
 		if (filmeRepositorio.logicalDeleteById(id) == 0) throw new RegistroNaoEncontradoException("O filme de id " + id + " não foi encontrado");
 	}

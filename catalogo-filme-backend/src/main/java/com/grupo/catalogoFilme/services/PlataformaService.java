@@ -48,6 +48,12 @@ public class PlataformaService {
         return plataformaMapper.toDTO(plataformaRepositorio.save(existente));
     }
 
+	public PlataformaResponseDTO atualizarImagem(Integer id, String url) {
+		Plataforma plataforma = buscarAtivo(id);
+		plataforma.setUrlImage(url);
+		return plataformaMapper.toDTO(plataformaRepositorio.save(plataforma));
+	}
+
 	public void excluirPlataforma(Integer id) {
 		Plataforma plataforma = buscarAtivo(id);
 		if (plataforma.getFilmes() != null && !plataforma.getFilmes().isEmpty()) throw new DadosInvalidosException("Não é possível deletar plataforma com filmes vinculados.");

@@ -4,15 +4,19 @@ package com.grupo.catalogoFilme.controllers;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.grupo.catalogoFilme.dto.plataforma.PlataformaCreateDTO;
 import com.grupo.catalogoFilme.dto.plataforma.PlataformaResponseDTO;
 import com.grupo.catalogoFilme.dto.plataforma.PlataformaUpdateDTO;
+import com.grupo.catalogoFilme.services.ImagemService;
 import com.grupo.catalogoFilme.services.PlataformaService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -24,6 +28,7 @@ import jakarta.validation.Valid;
 @Tag(name = "Plataformas", description = "Operações de cadastro, consulta, atualização e exclusão (lógica) de plataformas")
 public class PlataformaController {
 	@Autowired private PlataformaService service;
+	@Autowired private ImagemService imagemService;
 
 	@GetMapping
 	@Operation(summary = "Lista as plataformas ativas", description = "Retorna apenas as plataformas com status ATIVO")
@@ -65,6 +70,28 @@ public class PlataformaController {
 		@ApiResponse(responseCode = "404", description = "Plataforma não encontrada") })
 	public ResponseEntity<PlataformaResponseDTO> atualizar(@PathVariable Integer id, @RequestBody PlataformaUpdateDTO plataforma){
 		return ResponseEntity.ok(service.atualizar(id, plataforma));
+	}
+
+	@GetMapping(value = "/{id}/imagem")
+	@Operation(summary = "Exibe a imagem da plataforma", description = "Retorna o arquivo de imagem (bytes) para visualização/renderização")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Imagem retornada", content = @Content(mediaType = "image/*")),
+		@ApiResponse(responseCode = "404", description = "Plataforma ou imagem não encontrada") })
+	public ResponseEntity<byte[]> verImagem(@PathVariable Integer id){
+		ImagemService.ImagemBinaria img = imagemService.baixar(service.procurarPorId(id).getUrlImage());
+		return ResponseEntity.ok().contentType(img.contentType()).body(img.conteudo());
+	}
+
+	@PostMapping(value = "/{id}/imagem", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Operation(summary = "Envia a imagem da plataforma", description = "Restrito a ADMIN. Faz upload da imagem para o Cloudinary e salva a URL no campo url_image da plataforma")
+	@ApiResponses(value = {
+		@ApiResponse(responseCode = "200", description = "Imagem enviada e URL salva"),
+		@ApiResponse(responseCode = "400", description = "Arquivo inválido"),
+		@ApiResponse(responseCode = "403", description = "Acesso restrito a administradores"),
+		@ApiResponse(responseCode = "404", description = "Plataforma não encontrada") })
+	public ResponseEntity<PlataformaResponseDTO> enviarImagem(@PathVariable Integer id, @RequestParam("file") MultipartFile file){
+		String url = imagemService.upload(file, "plataformas");
+		return ResponseEntity.ok(service.atualizarImagem(id, url));
 	}
 
 	@DeleteMapping(value = "/{id}")
