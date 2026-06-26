@@ -1,50 +1,83 @@
 package com.grupo.catalogoFilme.services;
 
 
-import java.time.LocalDate;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.grupo.catalogoFilme.dto.avaliacao.AvaliacaoCreateDTO;
+import com.grupo.catalogoFilme.dto.avaliacao.AvaliacaoResponseDTO;
+import com.grupo.catalogoFilme.dto.avaliacao.AvaliacaoUpdateDTO;
 import com.grupo.catalogoFilme.entities.Avaliacao;
+import com.grupo.catalogoFilme.entities.Usuario;
+import com.grupo.catalogoFilme.enums.StatusRegistro;
+import com.grupo.catalogoFilme.exceptions.AcessoNegadoException;
 import com.grupo.catalogoFilme.exceptions.DadosInvalidosException;
 import com.grupo.catalogoFilme.exceptions.RegistroNaoEncontradoException;
+import com.grupo.catalogoFilme.mapper.AvaliacaoMapper;
 import com.grupo.catalogoFilme.repositories.AvaliacaoRepository;
-import com.grupo.catalogoFilme.repositories.FilmeRepository;
 
 @Service
 public class AvaliacaoService {
     @Autowired private AvaliacaoRepository avaliacaoRepositorio;
-    @Autowired private FilmeRepository filmeRepositorio;
+    @Autowired private AvaliacaoMapper avaliacaoMapper;
+    @Autowired private AuthorizationService authorizationService;
 
-	public List<Avaliacao> procurarAvaliacoes() { return avaliacaoRepositorio.findAll(); }
-	
-	public Avaliacao procurarPorId(Long id) {
-		return avaliacaoRepositorio.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Avaliação não encontrada"));
+	public List<AvaliacaoResponseDTO> procurarAvaliacoes() {
+		return avaliacaoRepositorio.findAllByStatusNot(StatusRegistro.INATIVO).stream().map(avaliacaoMapper::toDTO).toList();
 	}
-	
-	public String criarAvaliacao(Avaliacao avaliacao) {
-		if (avaliacao.getNota() == null || avaliacao.getNota() < 0 || avaliacao.getNota() > 5) throw new DadosInvalidosException("A nota deve ser entre 0 a 5.");
-		if (avaliacao.getComentario() == null || avaliacao.getComentario().isBlank()) throw new DadosInvalidosException("ERRO! É preciso comentar.");
-		if (avaliacao.getDataAvaliacao() == null || avaliacao.getDataAvaliacao().isAfter(LocalDate.now())) throw new DadosInvalidosException("Erro! Data inválida.");
-		if (avaliacao.getFilme() == null || avaliacao.getFilme().getId() == null) throw new DadosInvalidosException("Erro! ID do filme é obrigatório.");
-		
-		filmeRepositorio.findById(avaliacao.getFilme().getId()).orElseThrow(() -> new RegistroNaoEncontradoException("Filme não encontrado."));
+
+	public List<AvaliacaoResponseDTO> findAll() {
+		return avaliacaoRepositorio.findAll().stream().map(avaliacaoMapper::toDTO).toList();
+	}
+
+	public AvaliacaoResponseDTO procurarPorId(Integer id) {
+		return avaliacaoMapper.toDTO(buscarAtivo(id));
+	}
+
+	public List<AvaliacaoResponseDTO> procurarMinhasAvaliacoes() {
+		Usuario autenticado = authorizationService.usuarioAutenticado();
+		return avaliacaoRepositorio.findByUsuarioIdAndStatusNot(autenticado.getId(), StatusRegistro.INATIVO)
+				.stream().map(avaliacaoMapper::toDTO).toList();
+	}
+
+	public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoCreateDTO dto) {
+		if (dto.getNota() < 0 || dto.getNota() > 5) throw new DadosInvalidosException("A nota deve ser entre 0 a 5.");
+		Usuario dono = authorizationService.usuarioAutenticado();
+		Avaliacao avaliacao = avaliacaoMapper.toEntity(dto, dono);
+		avaliacao.setStatus(StatusRegistro.ATIVO);
+		return avaliacaoMapper.toDTO(avaliacaoRepositorio.save(avaliacao));
+	}
+
+	public AvaliacaoResponseDTO atualizarAvaliacao(Integer id, AvaliacaoUpdateDTO dto) {
+	    Avaliacao avaliacaoExistente = buscarAtivo(id);
+	    validarDono(avaliacaoExistente);
+	    if (dto.getNota() != null) {
+	    	if (dto.getNota() < 0 || dto.getNota() > 5) throw new DadosInvalidosException("A nota deve ser entre 0 a 5.");
+	    	avaliacaoExistente.setNota(dto.getNota());
+	    }
+	    if (dto.getComentario() != null) avaliacaoExistente.setComentario(dto.getComentario());
+	    return avaliacaoMapper.toDTO(avaliacaoRepositorio.save(avaliacaoExistente));
+	}
+
+	public void excluirAvaliacao(Integer id) {
+		Avaliacao avaliacao = buscarAtivo(id);
+		validarDono(avaliacao);
+		avaliacao.setStatus(StatusRegistro.INATIVO);
 		avaliacaoRepositorio.save(avaliacao);
-		return "Avaliação salva com sucesso!";
 	}
 
-	public String atualizarAvaliacao(Long id, Avaliacao dadosNovos) {
-	    Avaliacao avaliacaoExistente = procurarPorId(id);
-	    if (dadosNovos.getNota() != null) avaliacaoExistente.setNota(dadosNovos.getNota());
-	    if (dadosNovos.getComentario() != null) avaliacaoExistente.setComentario(dadosNovos.getComentario());
-	    avaliacaoRepositorio.save(avaliacaoExistente);
-	    return "Avaliação atualizada!";
+	private void validarDono(Avaliacao avaliacao) {
+		Usuario autenticado = authorizationService.usuarioAutenticado();
+		boolean dono = avaliacao.getUsuario() != null && avaliacao.getUsuario().getId().equals(autenticado.getId());
+		if (!dono && !authorizationService.isAdmin(autenticado)) {
+			throw new AcessoNegadoException("Você não tem permissão para alterar esta avaliação.");
+		}
 	}
 
-	public String excluirAvaliacao(Long id) {
-		if(!avaliacaoRepositorio.existsById(id)) throw new RegistroNaoEncontradoException("Avaliação não encontrada");
-		avaliacaoRepositorio.deleteById(id);
-		return "Avaliação deletada";
+	private Avaliacao buscarAtivo(Integer id) {
+		Avaliacao avaliacao = avaliacaoRepositorio.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Avaliação não encontrada"));
+		if (avaliacao.getStatus() == StatusRegistro.INATIVO) throw new RegistroNaoEncontradoException("Avaliação não encontrada");
+		return avaliacao;
 	}
 }

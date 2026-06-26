@@ -6,61 +6,73 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.grupo.catalogoFilme.dto.filme.FilmeCreateDTO;
+import com.grupo.catalogoFilme.dto.filme.FilmeResponseDTO;
+import com.grupo.catalogoFilme.dto.filme.FilmeUpdateDTO;
 import com.grupo.catalogoFilme.entities.Filme;
-import com.grupo.catalogoFilme.exceptions.DadosInvalidosException;
+import com.grupo.catalogoFilme.enums.StatusRegistro;
 import com.grupo.catalogoFilme.exceptions.FilmeJaFoiLogadoException;
 import com.grupo.catalogoFilme.exceptions.RegistroNaoEncontradoException;
+import com.grupo.catalogoFilme.mapper.FilmeMapper;
 import com.grupo.catalogoFilme.repositories.FilmeRepository;
-import com.grupo.catalogoFilme.repositories.GeneroRepository;
-import com.grupo.catalogoFilme.repositories.PlataformaRepository;
 
 @Service
 public class FilmeService {
 	@Autowired private FilmeRepository filmeRepositorio;
-	@Autowired private GeneroRepository generoRepositorio;
-	@Autowired private PlataformaRepository plataformaRepositorio;
+	@Autowired private FilmeMapper filmeMapper;
 
-	public List<Filme> procurarFilmes() { return filmeRepositorio.findAll(); }
-
-	public Filme procurarFilmeId(Long id) {
-		return filmeRepositorio.findById(id).orElseThrow(() ->
-        new RegistroNaoEncontradoException("Filme com id " + id + " não encontrado"));
+	public List<FilmeResponseDTO> procurarFilmes() {
+		return filmeRepositorio.findAllByStatusNot(StatusRegistro.INATIVO).stream().map(filmeMapper::toDTO).toList();
 	}
 
-	public String salvarFilme(Filme filme) {
-		if(filme.getTitulo() == null || filme.getTitulo().isBlank()) throw new DadosInvalidosException("ERRO! Título do filme é obrigatório");
-		if(filme.getDiretor() == null || filme.getDiretor().isBlank()) throw new DadosInvalidosException("ERRO! Diretor do filme é obrigatório");
-		if(filme.getAnoLancamento() == null || filme.getAnoLancamento() < 1888) throw new DadosInvalidosException("ERRO! Ano de lançamento inválido");
-		
-        if (filme.getGenero() == null || filme.getGenero().getId() == null) throw new DadosInvalidosException("ERRO! ID do gênero é obrigatório");
-        Long generoId = filme.getGenero().getId();
-        generoRepositorio.findById(generoId).orElseThrow(() -> new RegistroNaoEncontradoException("Não foi possível salvar: Gênero com ID " + generoId + " não encontrado."));
+	public List<FilmeResponseDTO> findAll() {
+		return filmeRepositorio.findAll().stream().map(filmeMapper::toDTO).toList();
+	}
 
-        if (filme.getPlataforma() == null || filme.getPlataforma().getId() == null) throw new DadosInvalidosException("ERRO! ID da plataforma é obrigatório");
-        Long plataformaId = filme.getPlataforma().getId();
-        plataformaRepositorio.findById(plataformaId).orElseThrow(() -> new RegistroNaoEncontradoException("Não foi possível salvar: Plataforma com ID " + plataformaId + " não encontrada."));
-        
+	public FilmeResponseDTO procurarFilmeId(Integer id) {
+		return filmeMapper.toDTO(buscarAtivo(id));
+	}
+
+	public List<FilmeResponseDTO> procurarPorNome(String nome) {
+		return filmeRepositorio.findByTituloContainingIgnoreCaseAndStatusNot(nome, StatusRegistro.INATIVO)
+				.stream().map(filmeMapper::toDTO).toList();
+	}
+
+	public FilmeResponseDTO salvarFilme(FilmeCreateDTO dto) {
         boolean filmeJaExiste = filmeRepositorio.findAll().stream()
-            .anyMatch(f -> f.getTitulo().equalsIgnoreCase(filme.getTitulo()) && f.getDiretor().equalsIgnoreCase(filme.getDiretor()) && f.getAnoLancamento().equals(filme.getAnoLancamento()));
+            .anyMatch(f -> f.getTitulo().equalsIgnoreCase(dto.getTitulo()) && f.getDiretor().equalsIgnoreCase(dto.getDiretor()) && f.getDataLancamento().equals(dto.getDataLancamento()));
         if (filmeJaExiste) throw new FilmeJaFoiLogadoException("ERRO! Já existe um filme cadastrado com esses dados.");
 
-		filmeRepositorio.save(filme);
-		return "Filme saved!";
+		Filme filme = filmeMapper.toEntity(dto);
+		filme.setStatus(StatusRegistro.ATIVO);
+		return filmeMapper.toDTO(filmeRepositorio.save(filme));
 	}
 
-	public String atualizarFilme(Long id, Filme filme) {
-		Filme existingFilme = filmeRepositorio.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Filme não encontrado"));
-		if (filme.getTitulo() != null && !filme.getTitulo().isBlank()) existingFilme.setTitulo(filme.getTitulo());
-        if (filme.getDiretor() != null && !filme.getDiretor().isBlank()) existingFilme.setDiretor(filme.getDiretor());
-        if (filme.getAnoLancamento() != null && filme.getAnoLancamento() >= 1888) existingFilme.setAnoLancamento(filme.getAnoLancamento());
-        
-        filmeRepositorio.save(existingFilme);
-		return "Filme atualizado com sucesso!";
+	public FilmeResponseDTO atualizarFilme(Integer id, FilmeUpdateDTO dto) {
+		Filme existingFilme = buscarAtivo(id);
+		if (dto.getTitulo() != null && !dto.getTitulo().isBlank()) existingFilme.setTitulo(dto.getTitulo());
+        if (dto.getDescricao() != null && !dto.getDescricao().isBlank()) existingFilme.setDescricao(dto.getDescricao());
+        if (dto.getDiretor() != null && !dto.getDiretor().isBlank()) existingFilme.setDiretor(dto.getDiretor());
+        if (dto.getDataLancamento() != null) existingFilme.setDataLancamento(dto.getDataLancamento());
+        if (dto.getUrlImage() != null && !dto.getUrlImage().isBlank()) existingFilme.setUrlImage(dto.getUrlImage());
+        if (dto.getGeneros() != null && !dto.getGeneros().isEmpty()) existingFilme.setGeneros(dto.getGeneros());
+
+        return filmeMapper.toDTO(filmeRepositorio.save(existingFilme));
 	}
 
-	public String excluirFilme(Long id) {
-		if(!filmeRepositorio.existsById(id)) throw new RegistroNaoEncontradoException("O filme de id "+id+" não foi encontrado");
-		filmeRepositorio.deleteById(id);
-		return "Filme deletado com sucesso";
+	public FilmeResponseDTO atualizarImagem(Integer id, String url) {
+		Filme filme = buscarAtivo(id);
+		filme.setUrlImage(url);
+		return filmeMapper.toDTO(filmeRepositorio.save(filme));
+	}
+
+	public void excluirFilme(Integer id) {
+		if (filmeRepositorio.logicalDeleteById(id) == 0) throw new RegistroNaoEncontradoException("O filme de id " + id + " não foi encontrado");
+	}
+
+	private Filme buscarAtivo(Integer id) {
+		Filme filme = filmeRepositorio.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException("Filme com id " + id + " não encontrado"));
+		if (filme.getStatus() == StatusRegistro.INATIVO) throw new RegistroNaoEncontradoException("Filme com id " + id + " não encontrado");
+		return filme;
 	}
 }

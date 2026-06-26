@@ -6,39 +6,25 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.grupo.catalogoFilme.entities.Genero;
+import com.grupo.catalogoFilme.dto.genero.GeneroResponseDTO;
 import com.grupo.catalogoFilme.services.GeneroService;
 
-import jakarta.validation.Valid;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 @RestController
 @RequestMapping(value = "/generos")
 @CrossOrigin(origins = "*")
+@Tag(name = "Gêneros", description = "Consulta dos gêneros disponíveis (valores fixos do sistema)")
 public class GeneroController {
 	@Autowired private GeneroService service;
-	
+
 	@GetMapping
-	public ResponseEntity<List<Genero>> procurarGenero(){
+	@Operation(summary = "Lista os gêneros disponíveis", description = "Retorna a lista fixa de gêneros do sistema (código e nome)")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
+	public ResponseEntity<List<GeneroResponseDTO>> procurarGenero(){
 		return ResponseEntity.status(HttpStatus.OK).body(service.procurarGenero());
-	}
-
-	@GetMapping(value = "/{id}")
-	public ResponseEntity<Genero> procurarPorId(@PathVariable Long id) {
-	    return ResponseEntity.ok(service.procurarPorId(id));
-	}
-	
-	@PostMapping
-	public ResponseEntity<String> criarGenero(@Valid @RequestBody Genero genero){
-		return ResponseEntity.status(HttpStatus.CREATED).body(service.criarGenero(genero));
-	}
-
-	@PutMapping(value = "/{id}")
-	public ResponseEntity<String> atualizarGenero(@PathVariable Long id, @RequestBody Genero genero){
-		return ResponseEntity.ok(service.atualizarGenero(id, genero));
-	}
-
-	@DeleteMapping(value = "/{id}")
-	public ResponseEntity<String> excluirGenero(@PathVariable Long id){
-		return ResponseEntity.status(HttpStatus.OK).body(service.excluirGenero(id));
 	}
 }

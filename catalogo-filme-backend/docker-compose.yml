@@ -1,0 +1,17 @@
+name: filmes-plataform
+
+services:
+  mysql-db:
+    image: mysql:8.0
+    container_name: filmes-plataform-mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: catalogo-filme
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: adminpassword
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./db/data:/var/lib/mysql
+      - ./db/init:/docker-entrypoint-initdb.d
