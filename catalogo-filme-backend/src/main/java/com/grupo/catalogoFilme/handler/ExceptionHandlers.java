@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import com.grupo.catalogoFilme.exceptions.*;
 
@@ -27,4 +28,6 @@ public class ExceptionHandlers {
  public ResponseEntity<String> handlePlataformaJaExiste(PlataformaJaExisteException e) { return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); }
 	@ExceptionHandler(FilmeJaFoiLogadoException.class)
  public ResponseEntity<String> handleFilmeJaFoiLoggado(FilmeJaFoiLogadoException e) { return ResponseEntity.status(HttpStatus.CONFLICT).body(e.getMessage()); }
+	@ExceptionHandler(MaxUploadSizeExceededException.class)
+ public ResponseEntity<String> handleMaxUploadSize(MaxUploadSizeExceededException e) { return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Imagem excede o tamanho máximo permitido."); }
 }

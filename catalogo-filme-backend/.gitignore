@@ -1,3 +1,4 @@
 target/
 db/data/
 .idea
+.env
