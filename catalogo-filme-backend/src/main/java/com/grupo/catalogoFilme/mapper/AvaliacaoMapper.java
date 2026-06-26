@@ -25,7 +25,7 @@ public class AvaliacaoMapper {
 
 	public AvaliacaoResponseDTO toDTO(Avaliacao avaliacao) {
 		if (avaliacao == null) return null;
-		return new AvaliacaoResponseDTO(avaliacao.getId(), avaliacao.getComentario(), avaliacao.getUrlImage(),
+		return new AvaliacaoResponseDTO(avaliacao.getId(), avaliacao.getComentario(),
 				avaliacao.getNota(), avaliacao.getStatus(), usuarioMapper.toDTO(avaliacao.getUsuario()),
 				filmeMapper.toDTO(avaliacao.getFilme()));
 	}
@@ -35,7 +35,6 @@ public class AvaliacaoMapper {
 				.orElseThrow(() -> new RegistroNaoEncontradoException("Filme não encontrado."));
 		Avaliacao avaliacao = new Avaliacao();
 		avaliacao.setComentario(dto.getComentario());
-		avaliacao.setUrlImage(dto.getUrlImage());
 		avaliacao.setNota(dto.getNota());
 		avaliacao.setFilme(filme);
 		avaliacao.setUsuario(usuario);

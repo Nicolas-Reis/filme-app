@@ -57,7 +57,6 @@ public class AvaliacaoService {
 	    	avaliacaoExistente.setNota(dto.getNota());
 	    }
 	    if (dto.getComentario() != null) avaliacaoExistente.setComentario(dto.getComentario());
-	    if (dto.getUrlImage() != null) avaliacaoExistente.setUrlImage(dto.getUrlImage());
 	    return avaliacaoMapper.toDTO(avaliacaoRepositorio.save(avaliacaoExistente));
 	}
 

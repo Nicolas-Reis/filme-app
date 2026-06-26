@@ -31,7 +31,7 @@ public class FilmeMapper {
 		List<GeneroResponseDTO> generos = filme.getGeneros() == null ? List.of()
 				: filme.getGeneros().stream().map(generoMapper::toDTO).toList();
 		return new FilmeResponseDTO(filme.getId(), filme.getTitulo(), filme.getDescricao(), filme.getDiretor(),
-				filme.getDataLancamento(), filme.getStatus(), generos,
+				filme.getDataLancamento(), filme.getUrlImage(), filme.getStatus(), generos,
 				plataformaMapper.toDTO(filme.getPlataforma()));
 	}
 
@@ -43,6 +43,7 @@ public class FilmeMapper {
 		filme.setDescricao(dto.getDescricao());
 		filme.setDiretor(dto.getDiretor());
 		filme.setDataLancamento(dto.getDataLancamento());
+		filme.setUrlImage(dto.getUrlImage());
 		filme.setGeneros(dto.getGeneros());
 		filme.setPlataforma(plataforma);
 		return filme;

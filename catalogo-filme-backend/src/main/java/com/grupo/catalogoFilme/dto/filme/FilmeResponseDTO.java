@@ -14,6 +14,7 @@ public class FilmeResponseDTO {
 	private String descricao;
 	private String diretor;
 	private LocalDate dataLancamento;
+	private String urlImage;
 	private StatusRegistro status;
 	private List<GeneroResponseDTO> generos;
 	private PlataformaResponseDTO plataforma;
@@ -21,12 +22,13 @@ public class FilmeResponseDTO {
 	public FilmeResponseDTO() {}
 
 	public FilmeResponseDTO(Integer id, String titulo, String descricao, String diretor, LocalDate dataLancamento,
-			StatusRegistro status, List<GeneroResponseDTO> generos, PlataformaResponseDTO plataforma) {
+			String urlImage, StatusRegistro status, List<GeneroResponseDTO> generos, PlataformaResponseDTO plataforma) {
 		this.id = id;
 		this.titulo = titulo;
 		this.descricao = descricao;
 		this.diretor = diretor;
 		this.dataLancamento = dataLancamento;
+		this.urlImage = urlImage;
 		this.status = status;
 		this.generos = generos;
 		this.plataforma = plataforma;
@@ -70,6 +72,14 @@ public class FilmeResponseDTO {
 
 	public void setDataLancamento(LocalDate dataLancamento) {
 		this.dataLancamento = dataLancamento;
+	}
+
+	public String getUrlImage() {
+		return urlImage;
+	}
+
+	public void setUrlImage(String urlImage) {
+		this.urlImage = urlImage;
 	}
 
 	public StatusRegistro getStatus() {

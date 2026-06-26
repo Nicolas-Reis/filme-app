@@ -24,9 +24,6 @@ public class Avaliacao {
 	@Column(name = "comentario", nullable = false)
 	private String comentario;
 
-	@Column(name = "url_image")
-	private String urlImage;
-
 	@Column(name = "nota", nullable = false)
 	private Double nota;
 
@@ -44,10 +41,9 @@ public class Avaliacao {
 
 	public Avaliacao() {}
 
-	public Avaliacao(Integer id, String comentario, String urlImage, Double nota, Usuario usuario, Filme filme) {
+	public Avaliacao(Integer id, String comentario, Double nota, Usuario usuario, Filme filme) {
 		this.id = id;
 		this.comentario = comentario;
-		this.urlImage = urlImage;
 		this.nota = nota;
 		this.usuario = usuario;
 		this.filme = filme;
@@ -75,14 +71,6 @@ public class Avaliacao {
 
 	public void setComentario(String comentario) {
 		this.comentario = comentario;
-	}
-
-	public String getUrlImage() {
-		return urlImage;
-	}
-
-	public void setUrlImage(String urlImage) {
-		this.urlImage = urlImage;
 	}
 
 	public Usuario getUsuario() {

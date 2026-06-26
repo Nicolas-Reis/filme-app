@@ -19,6 +19,7 @@ public class FilmeCreateDTO {
 	private String diretor;
 	@NotNull(message = "Data de lançamento é obrigatória")
 	private LocalDate dataLancamento;
+	private String urlImage;
 	@NotEmpty(message = "Informe ao menos um gênero")
 	private Set<GeneroEnum> generos;
 	@NotNull(message = "ID da plataforma é obrigatório")
@@ -26,11 +27,12 @@ public class FilmeCreateDTO {
 
 	public FilmeCreateDTO() {}
 
-	public FilmeCreateDTO(String titulo, String descricao, String diretor, LocalDate dataLancamento, Set<GeneroEnum> generos, Integer plataformaId) {
+	public FilmeCreateDTO(String titulo, String descricao, String diretor, LocalDate dataLancamento, String urlImage, Set<GeneroEnum> generos, Integer plataformaId) {
 		this.titulo = titulo;
 		this.descricao = descricao;
 		this.diretor = diretor;
 		this.dataLancamento = dataLancamento;
+		this.urlImage = urlImage;
 		this.generos = generos;
 		this.plataformaId = plataformaId;
 	}
@@ -65,6 +67,14 @@ public class FilmeCreateDTO {
 
 	public void setDataLancamento(LocalDate dataLancamento) {
 		this.dataLancamento = dataLancamento;
+	}
+
+	public String getUrlImage() {
+		return urlImage;
+	}
+
+	public void setUrlImage(String urlImage) {
+		this.urlImage = urlImage;
 	}
 
 	public Set<GeneroEnum> getGeneros() {

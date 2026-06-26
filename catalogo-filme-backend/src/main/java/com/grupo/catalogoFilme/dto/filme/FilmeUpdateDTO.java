@@ -11,15 +11,17 @@ public class FilmeUpdateDTO {
 	private String descricao;
 	private String diretor;
 	private LocalDate dataLancamento;
+	private String urlImage;
 	private Set<GeneroEnum> generos;
 
 	public FilmeUpdateDTO() {}
 
-	public FilmeUpdateDTO(String titulo, String descricao, String diretor, LocalDate dataLancamento, Set<GeneroEnum> generos) {
+	public FilmeUpdateDTO(String titulo, String descricao, String diretor, LocalDate dataLancamento, String urlImage, Set<GeneroEnum> generos) {
 		this.titulo = titulo;
 		this.descricao = descricao;
 		this.diretor = diretor;
 		this.dataLancamento = dataLancamento;
+		this.urlImage = urlImage;
 		this.generos = generos;
 	}
 
@@ -53,6 +55,14 @@ public class FilmeUpdateDTO {
 
 	public void setDataLancamento(LocalDate dataLancamento) {
 		this.dataLancamento = dataLancamento;
+	}
+
+	public String getUrlImage() {
+		return urlImage;
+	}
+
+	public void setUrlImage(String urlImage) {
+		this.urlImage = urlImage;
 	}
 
 	public Set<GeneroEnum> getGeneros() {

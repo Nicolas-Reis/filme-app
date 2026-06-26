@@ -46,6 +46,9 @@ public class Filme {
 	@Column(name = "data_lancamento")
 	private LocalDate dataLancamento;
 
+	@Column(name = "url_image")
+	private String urlImage;
+
 	@Convert(converter = StatusRegistroConverter.class)
 	@Column(name = "status", nullable = false)
 	private StatusRegistro status = StatusRegistro.ATIVO;
@@ -67,12 +70,13 @@ public class Filme {
 
 	public Filme() {}
 
-	public Filme(Integer id, String titulo, String descricao, String diretor, LocalDate dataLancamento, Set<GeneroEnum> generos, Plataforma plataforma) {
+	public Filme(Integer id, String titulo, String descricao, String diretor, LocalDate dataLancamento, String urlImage, Set<GeneroEnum> generos, Plataforma plataforma) {
 		this.id = id;
 		this.titulo = titulo;
 		this.descricao = descricao;
 		this.diretor = diretor;
 		this.dataLancamento = dataLancamento;
+		this.urlImage = urlImage;
 		this.generos = generos;
 		this.plataforma = plataforma;
 	}
@@ -115,6 +119,14 @@ public class Filme {
 
 	public void setDataLancamento(LocalDate dataLancamento) {
 		this.dataLancamento = dataLancamento;
+	}
+
+	public String getUrlImage() {
+		return urlImage;
+	}
+
+	public void setUrlImage(String urlImage) {
+		this.urlImage = urlImage;
 	}
 
 	public StatusRegistro getStatus() {

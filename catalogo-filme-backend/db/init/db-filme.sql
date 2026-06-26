@@ -56,6 +56,7 @@ CREATE TABLE IF NOT EXISTS `catalogo-filme`.`filmes` (
   `descricao` VARCHAR(255) NOT NULL,
   `diretor` VARCHAR(45) NOT NULL,
   `data_lancamento` DATE NOT NULL,
+  `url_image` VARCHAR(255) NULL,
   `plataforma_id` INT NOT NULL,
   `status` INT NOT NULL DEFAULT 1,
   PRIMARY KEY (`id`),
@@ -90,7 +91,6 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `catalogo-filme`.`avaliacoes` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `comentario` VARCHAR(255) NOT NULL,
-  `url_image` VARCHAR(255) NULL,
   `nota` DOUBLE NOT NULL,
   `usuario_id` INT NOT NULL,
   `filme_id` INT NOT NULL,
