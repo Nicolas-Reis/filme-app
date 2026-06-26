@@ -33,6 +33,11 @@ public class FilmeService {
 		return filmeMapper.toDTO(buscarAtivo(id));
 	}
 
+	public List<FilmeResponseDTO> procurarPorNome(String nome) {
+		return filmeRepositorio.findByTituloContainingIgnoreCaseAndStatusNot(nome, StatusRegistro.INATIVO)
+				.stream().map(filmeMapper::toDTO).toList();
+	}
+
 	public FilmeResponseDTO salvarFilme(FilmeCreateDTO dto) {
         boolean filmeJaExiste = filmeRepositorio.findAll().stream()
             .anyMatch(f -> f.getTitulo().equalsIgnoreCase(dto.getTitulo()) && f.getDiretor().equalsIgnoreCase(dto.getDiretor()) && f.getDataLancamento().equals(dto.getDataLancamento()));

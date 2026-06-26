@@ -18,6 +18,8 @@ public interface FilmeRepository extends JpaRepository<Filme, Integer>{
 
 	List<Filme> findAllByStatusNot(StatusRegistro status);
 
+	List<Filme> findByTituloContainingIgnoreCaseAndStatusNot(String titulo, StatusRegistro status);
+
 	@Modifying
 	@Transactional
 	@Query("UPDATE Filme f SET f.status = com.grupo.catalogoFilme.enums.StatusRegistro.INATIVO WHERE f.id = :id")

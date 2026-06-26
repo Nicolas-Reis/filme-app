@@ -39,6 +39,13 @@ public class FilmeController {
 		return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
 	}
 
+	@GetMapping(value = "/buscar")
+	@Operation(summary = "Pesquisa filmes pelo nome", description = "Retorna os filmes ativos cujo título contém o termo informado (busca parcial, ignora maiúsculas/minúsculas)")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
+	public ResponseEntity<List<FilmeResponseDTO>> procurarPorNome(@RequestParam String nome){
+		return ResponseEntity.status(HttpStatus.OK).body(service.procurarPorNome(nome));
+	}
+
 	@GetMapping(value = "/{id}")
 	@Operation(summary = "Busca um filme por ID")
 	@ApiResponses(value = {
