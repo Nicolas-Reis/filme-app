@@ -38,6 +38,13 @@ public class AvaliacaoController {
 		return ResponseEntity.status(HttpStatus.OK).body(service.findAll());
 	}
 
+	@GetMapping(value = "/minhas")
+	@Operation(summary = "Lista as avaliações do usuário autenticado", description = "Retorna as avaliações ativas feitas pelo usuário logado, com as informações do filme avaliado")
+	@ApiResponses(value = { @ApiResponse(responseCode = "200", description = "Lista retornada com sucesso") })
+	public ResponseEntity<List<AvaliacaoResponseDTO>> procurarMinhasAvaliacoes(){
+		return ResponseEntity.status(HttpStatus.OK).body(service.procurarMinhasAvaliacoes());
+	}
+
 	@GetMapping(value = "/{id}")
 	@Operation(summary = "Busca uma avaliação por ID")
 	@ApiResponses(value = {

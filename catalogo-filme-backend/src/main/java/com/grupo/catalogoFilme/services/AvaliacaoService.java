@@ -35,6 +35,12 @@ public class AvaliacaoService {
 		return avaliacaoMapper.toDTO(buscarAtivo(id));
 	}
 
+	public List<AvaliacaoResponseDTO> procurarMinhasAvaliacoes() {
+		Usuario autenticado = authorizationService.usuarioAutenticado();
+		return avaliacaoRepositorio.findByUsuarioIdAndStatusNot(autenticado.getId(), StatusRegistro.INATIVO)
+				.stream().map(avaliacaoMapper::toDTO).toList();
+	}
+
 	public AvaliacaoResponseDTO criarAvaliacao(AvaliacaoCreateDTO dto) {
 		if (dto.getNota() < 0 || dto.getNota() > 5) throw new DadosInvalidosException("A nota deve ser entre 0 a 5.");
 		Usuario dono = authorizationService.usuarioAutenticado();

@@ -17,6 +17,8 @@ public interface AvaliacaoRepository extends JpaRepository<Avaliacao, Integer>{
 
 	List<Avaliacao> findAllByStatusNot(StatusRegistro status);
 
+	List<Avaliacao> findByUsuarioIdAndStatusNot(Integer usuarioId, StatusRegistro status);
+
 	@Modifying
 	@Transactional
 	@Query("UPDATE Avaliacao a SET a.status = com.grupo.catalogoFilme.enums.StatusRegistro.INATIVO WHERE a.id = :id")
